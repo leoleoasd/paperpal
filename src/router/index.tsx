@@ -1,49 +1,49 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import ProjectsView from '@/views/ProjectsView.vue';
-import CreateProjectView from '@/views/CreateProjectView.vue';
-import ProjectView from '@/views/ProjectView.vue';
-import LabelView from '@/views/LabelView.vue';
-import SequenceTag from '@/views/label/SequenceTag.vue';
-import IncontextLabeling from '@/views/label/IncontextLabeling.vue';
+import PaperListView from '@/views/PaperListView.vue';
 
 // let auth: null | ReturnType<typeof useAuthStore> = null;
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/',
+      name: 'home',
+      component: PaperListView,
+    },
     // {
     //   path: '/',
     //   name: 'sequence_tag',
     //   component: SequenceTag,
     // }
-    {
-      path: '/test',
-      name: 'incontextlabel',
-      component: IncontextLabeling,
-    },
-    {
-      path: '/',
-      alias: ['/projects', '/project'],
-      name: 'home',
-      component: ProjectsView,
-    },
-    {
-      path: '/project/new',
-      name: 'project.new',
-      component: CreateProjectView,
-    },
-    {
-      path: '/project/:projectId',
-      name: 'project',
-      component: ProjectView,
-      props: true,
-    },
-    {
-      path: '/project/:projectId/label/:labelId',
-      name: 'label',
-      component: LabelView,
-      props: true,
-    }
+    // {
+    //   path: '/test',
+    //   name: 'incontextlabel',
+    //   component: IncontextLabeling,
+    // },
+    // {
+    //   path: '/',
+    //   alias: ['/projects', '/project'],
+    //   name: 'home',
+    //   component: ProjectsView,
+    // },
+    // {
+    //   path: '/project/new',
+    //   name: 'project.new',
+    //   component: CreateProjectView,
+    // },
+    // {
+    //   path: '/project/:projectId',
+    //   name: 'project',
+    //   component: ProjectView,
+    //   props: true,
+    // },
+    // {
+    //   path: '/project/:projectId/label/:labelId',
+    //   name: 'label',
+    //   component: LabelView,
+    //   props: true,
+    // }
     // {
     //   name: 'login',
     //   path: '/login',

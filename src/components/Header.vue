@@ -29,7 +29,7 @@ const stateText = computed(() => ({
         style="color: inherit; text-decoration: none;"
         @click="$event.preventDefault(); $router.push('/')"
       >
-        Annotator
+        PaperPal
       </a>
       <div class="space"></div>
       <!-- <n-divider
