@@ -10,6 +10,15 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: PaperListView,
+      children: [
+        {
+          path: 'paper/:paperId',
+          name: 'paper',
+          component: () => import('@/views/SidePannel.vue'),
+          props: true,
+
+        }
+      ]
     },
     // {
     //   path: '/',

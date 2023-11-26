@@ -13,6 +13,7 @@ declare global {
   interface Window { $dialog: ReturnType<typeof useDialog>; $message: ReturnType<typeof useMessage>; }
 }
 
+
 const app = createApp(App);
 
 app.use(createPinia());

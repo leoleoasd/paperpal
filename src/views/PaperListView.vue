@@ -9,7 +9,7 @@ const papers = ref(JSON.parse(JSON.stringify(json_papers)));
 const all_tags = [
   'nlp', 'hci', 'to_read', 'interesting', 'arxiv',
 ];
-const hueStep = 360 / all_tags.length;
+const hueStep = 30;
 const hueValues = lodash.range(0, 360, hueStep);
 
 let hueDictionary: { [key: string]: number } = {};
@@ -50,11 +50,58 @@ for (const paper of papers.value) {
 
   const authors = paper.author.split(' and ');
   paper.smart_authors = lodash.sampleSize(authors, Math.min(3, authors.length));
+  paper.adding_tag = false;
+  paper.new_tag = '';
 }
+const input_refs = ref([]);
 
 const removeTag = (id: number, tagName: string) => {
   console.log(id, tagName);
   papers.value[id].tags = papers.value[id].tags.filter((tag: { name: string; }) => tag.name !== tagName);
+};
+const addtag = (id: number) => {
+  console.log(id);
+  if (papers.value[id].new_tag) {
+    if (papers.value[id].tags.map((tag: { name: string; }) => tag.name).includes(papers.value[id].new_tag)) {
+      papers.value[id].adding_tag = false;
+      papers.value[id].new_tag = '';
+    } else {
+      // if not present, assign new hue
+      if (!hueDictionary[papers.value[id].new_tag]) {
+        hueDictionary[papers.value[id].new_tag] = hueValues[Object.keys(hueDictionary).length];
+      }
+      const tag = papers.value[id].new_tag;
+      const conv = new Hsluv();
+      conv.hsluv_h = hueDictionary[tag];
+      conv.hsluv_s = 100;
+      conv.hsluv_l = 95;
+      conv.hsluvToHex();
+
+      const convBorderColor = new Hsluv();
+      convBorderColor.hsluv_h = hueDictionary[tag];
+      convBorderColor.hsluv_s = 100;
+      convBorderColor.hsluv_l = 70;
+      convBorderColor.hsluvToHex();
+
+      const convTextColor = new Hsluv();
+      convTextColor.hsluv_h = hueDictionary[tag];
+      convTextColor.hsluv_s = 100;
+      convTextColor.hsluv_l = 35;
+      convTextColor.hsluvToHex();
+
+      papers.value[id].tags.push({
+        name: tag,
+        color: {
+          color: conv.hex,
+          borderColor: convBorderColor.hex,
+          textColor: convTextColor.hex,
+        }
+      });
+
+      papers.value[id].adding_tag = false;
+      papers.value[id].new_tag = '';
+    }
+  }
 };
 </script>
 
@@ -93,6 +140,7 @@ const removeTag = (id: number, tagName: string) => {
           <tr
             v-for="paper, id in papers"
             :key="paper.id"
+            @click="() => $router.push(`/paper/${id}`)"
           >
             <td>{{ paper.title }}</td>
             <td>{{ paper.smart_authors.join(', ') }}</td>
@@ -109,6 +157,23 @@ const removeTag = (id: number, tagName: string) => {
                 >
                   {{ tag.name }}
                 </n-tag>
+                <n-tag
+                  v-if="!paper.adding_tag"
+                  size="small"
+                  @click="paper.adding_tag=true; $nextTick(() => input_refs[id].focus())"
+                >
+                  +
+                </n-tag>
+                <n-input
+                  v-if="paper.adding_tag"
+                  ref="input_refs"
+                  v-model:value="paper.new_tag"
+                  size="small"
+                  style="width: 300px;"
+                  placeholder="Press enter to add tag"
+                  @blur="paper.adding_tag=false"
+                  @keydown.enter="addtag(id)"
+                ></n-input>
               </div>
             </td>
             <td>
@@ -135,6 +200,15 @@ const removeTag = (id: number, tagName: string) => {
         </tbody>
       </n-table>
     </n-card>
+    <router-view v-slot="{ Component }">
+      <!-- Use any custom transition and  to `fade` -->
+      <Transition
+        name="slide-right"
+        :duration="500"
+      >
+        <component :is="Component"></component>
+      </Transition>
+    </router-view>
   </div>
 </template>
 
