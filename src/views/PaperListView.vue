@@ -2,7 +2,7 @@
 import json_papers from './papers.json';
 import lodash from 'lodash';
 import {Hsluv} from 'hsluv';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 const papers = ref(JSON.parse(JSON.stringify(json_papers)));
 
@@ -100,9 +100,26 @@ const addtag = (id: number) => {
 
       papers.value[id].adding_tag = false;
       papers.value[id].new_tag = '';
+      if (!all_tags.includes(tag)) {
+        all_tags.push(tag);
+      }
     }
   }
 };
+
+const options = computed(() => {
+  let ret = all_tags.map(t => ({ value: t, label: t }));
+  // find paper with adding_tag
+  const paper = papers.value.find(p => p.adding_tag);
+  if (!paper) {
+    return ret;
+  }
+  if (paper.new_tag) {
+    ret = ret.filter(t => t.value.startsWith(paper.new_tag));
+  }
+  ret.push({ value: paper.new_tag, label: paper.new_tag });
+  return ret;
+});
 </script>
 
 <template>
@@ -140,12 +157,16 @@ const addtag = (id: number) => {
           <tr
             v-for="paper, id in papers"
             :key="paper.id"
+            class="table-row"
             @click="() => $router.push(`/paper/${id}`)"
           >
             <td>{{ paper.title }}</td>
             <td>{{ paper.smart_authors.join(', ') }}</td>
             <td>
-              <div class="tags">
+              <div
+                class="tags"
+                @click.stop="() => {}"
+              >
                 <n-tag
                   v-for="tag in paper.tags"
                   :key="tag.name"
@@ -160,20 +181,24 @@ const addtag = (id: number) => {
                 <n-tag
                   v-if="!paper.adding_tag"
                   size="small"
-                  @click="paper.adding_tag=true; $nextTick(() => input_refs[id].focus())"
+                  @click.stop="paper.adding_tag=true; $nextTick(() => input_refs[0].focus())"
                 >
                   +
                 </n-tag>
-                <n-input
+                <n-auto-complete
                   v-if="paper.adding_tag"
                   ref="input_refs"
                   v-model:value="paper.new_tag"
                   size="small"
                   style="width: 300px;"
                   placeholder="Press enter to add tag"
+                  :options="options"
+                  :input-props="{
+                    autocomplete: 'disabled'
+                  }"
                   @blur="paper.adding_tag=false"
                   @keydown.enter="addtag(id)"
-                ></n-input>
+                ></n-auto-complete>
               </div>
             </td>
             <td>
@@ -204,7 +229,7 @@ const addtag = (id: number) => {
       <!-- Use any custom transition and  to `fade` -->
       <Transition
         name="slide-right"
-        :duration="500"
+        :duration="300"
       >
         <component :is="Component"></component>
       </Transition>
@@ -218,5 +243,13 @@ const addtag = (id: number) => {
     row-gap: 8px;
     column-gap: 8px;
     flex-wrap: wrap;
+}
+.table-row {
+  &:hover {
+    cursor: pointer;
+    > td {
+      background-color: #f5f5f5;
+    }
+  }
 }
 </style>

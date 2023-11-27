@@ -14,7 +14,7 @@ const router = createRouter({
         {
           path: 'paper/:paperId',
           name: 'paper',
-          component: () => import('@/views/SidePannel.vue'),
+          component: () => import('@/views/SidePanel.vue'),
           props: true,
 
         }
