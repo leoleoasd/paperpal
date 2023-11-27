@@ -20,6 +20,11 @@ const router = createRouter({
         }
       ]
     },
+    {
+      path: '/reader',
+      name: 'reader',
+      component: () => import('@/views/ReaderView.vue'),
+    },
     // {
     //   path: '/',
     //   name: 'sequence_tag',

@@ -205,6 +205,7 @@ const options = computed(() => {
               <n-button-group>
                 <n-button
                   size="small"
+                  @click.stop="() => $router.push(`/reader`)"
                 >
                   Read
                 </n-button>
